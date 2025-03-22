@@ -1,3 +1,4 @@
+"""
 import pygame 
 import math
 from OpenGL.GLU import *
@@ -5,8 +6,6 @@ from OpenGL.GL import *
 from OpenGL.GLUT import *
 from pygame.locals import *
 from PIL import Image
-
-
 def rectangulo(width=2, height=1, depth=3):
 
     w, h, d = width / 2, height / 2, depth / 2  # Mitades para centrarlo
@@ -191,5 +190,131 @@ def cubo(size=1):
         for j in faces[i]:
             glVertex3fv(vertices[j])  # Dibuja los vértices
     glEnd()
+"""
+import pygame
+from pygame.locals import *
+from OpenGL.GL import *
+from OpenGL.GLU import *
+import math
 
-    
+class Figuras3D:
+
+    def __init__(self):
+        pass
+
+    def establecer_color(self, color):
+        glColor3fv(color)
+
+    def dibujar_cubo(self, x, y, z, tamaño, color):
+        self.establecer_color(color)
+        mitad = tamaño / 2
+        vertices = [
+            [x - mitad, y - mitad, z - mitad],
+            [x + mitad, y - mitad, z - mitad],
+            [x + mitad, y + mitad, z - mitad],
+            [x - mitad, y + mitad, z - mitad],
+            [x - mitad, y - mitad, z + mitad],
+            [x + mitad, y - mitad, z + mitad],
+            [x + mitad, y + mitad, z + mitad],
+            [x - mitad, y + mitad, z + mitad],
+        ]
+        caras = [
+            [0,1,2,3],
+            [4,5,6,7],
+            [0,1,5,4],
+            [2,3,7,6],
+            [1,2,6,5],
+            [0,3,7,4]
+        ]
+        glBegin(GL_QUADS)
+        for cara in caras:
+            for vertice in cara:
+                glVertex3fv(vertices[vertice])
+        glEnd()
+
+    def dibujar_prisma(self, x, y, z, base, altura, color):
+        self.establecer_color(color)
+        mitad = base / 2
+        vertices = [
+            [x - mitad, y - mitad, z],
+            [x + mitad, y - mitad, z],
+            [x + mitad, y + mitad, z],
+            [x - mitad, y + mitad, z],
+            [x - mitad, y - mitad, z + altura],
+            [x + mitad, y - mitad, z + altura],
+            [x + mitad, y + mitad, z + altura],
+            [x - mitad, y + mitad, z + altura],
+        ]
+        caras = [
+            [0,1,2,3],
+            [4,5,6,7],
+            [0,1,5,4],
+            [2,3,7,6],
+            [1,2,6,5],
+            [0,3,7,4]
+        ]
+        glBegin(GL_QUADS)
+        for cara in caras:
+            for vertice in cara:
+                glVertex3fv(vertices[vertice])
+        glEnd()
+
+    def dibujar_cono(self, x, y, z, radio, altura, color, segmentos=32):
+        self.establecer_color(color)
+        glBegin(GL_TRIANGLE_FAN)
+        glVertex3f(x, y, z + altura)
+        for i in range(segmentos + 1):
+            angulo = 2 * math.pi * i / segmentos
+            vx = x + radio * math.cos(angulo)
+            vy = y + radio * math.sin(angulo)
+            glVertex3f(vx, vy, z)
+        glEnd()
+
+        glBegin(GL_TRIANGLE_FAN)
+        glVertex3f(x, y, z)
+        for i in range(segmentos + 1):
+            angulo = 2 * math.pi * i / segmentos
+            vx = x + radio * math.cos(angulo)
+            vy = y + radio * math.sin(angulo)
+            glVertex3f(vx, vy, z)
+        glEnd()
+
+    def dibujar_piramide(self, x, y, z, base, altura, color):
+        self.establecer_color(color)
+        mitad = base / 2
+        vertices_base = [
+            [x - mitad, y - mitad, z],
+            [x + mitad, y - mitad, z],
+            [x + mitad, y + mitad, z],
+            [x - mitad, y + mitad, z],
+        ]
+        vertice_apice = [x, y, z + altura]
+
+        glBegin(GL_TRIANGLES)
+        for i in range(4):
+            glVertex3fv(vertices_base[i])
+            glVertex3fv(vertices_base[(i + 1) % 4])
+            glVertex3fv(vertice_apice)
+        glEnd()
+
+        glBegin(GL_QUADS)
+        for vertice in vertices_base:
+            glVertex3fv(vertice)
+        glEnd()
+
+    def dibujar_esfera(self, x, y, z, radio, color):
+        self.establecer_color(color)
+        glPushMatrix()
+        glTranslatef(x, y, z)
+        quadric = gluNewQuadric()
+        gluSphere(quadric, radio, 32, 32)
+        gluDeleteQuadric(quadric)
+        glPopMatrix()
+
+def iniciar_pantalla(ancho=800, alto=600):
+    pygame.init()
+    pygame.display.set_mode((ancho, alto), DOUBLEBUF | OPENGL)
+    glEnable(GL_DEPTH_TEST)
+    gluPerspective(45, (ancho / alto), 0.1, 100.0)
+    glTranslatef(0.0, 0.0, -20)
+ 
