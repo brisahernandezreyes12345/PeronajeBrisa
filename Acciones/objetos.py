@@ -317,4 +317,4 @@ def iniciar_pantalla(ancho=800, alto=600):
     glEnable(GL_DEPTH_TEST)
     gluPerspective(45, (ancho / alto), 0.1, 100.0)
     glTranslatef(0.0, 0.0, -20)
- 
+ #Ejemplo
