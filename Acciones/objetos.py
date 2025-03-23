@@ -1,320 +1,187 @@
-"""
-import pygame 
-import math
-from OpenGL.GLU import *
+
 from OpenGL.GL import *
+from OpenGL.GLU import *
 from OpenGL.GLUT import *
-from pygame.locals import *
-from PIL import Image
-def rectangulo(width=2, height=1, depth=3):
-
-    w, h, d = width / 2, height / 2, depth / 2  # Mitades para centrarlo
-
-    vertices = [
-        [-w, -h, -d], [w, -h, -d], [w,  h, -d], [-w,  h, -d],  # Cara trasera
-        [-w, -h,  d], [w, -h,  d], [w,  h,  d], [-w,  h,  d]   # Cara frontal
-    ]
-
-    faces = [
-        (0, 1, 2, 3),  # Trasera
-        (4, 5, 6, 7),  # Frontal
-        (0, 1, 5, 4),  # Inferior
-        (2, 3, 7, 6),  # Superior
-        (0, 3, 7, 4),  # Izquierda
-        (1, 2, 6, 5)   # Derecha
-    ]
-
-    normals = [
-        (0, 0, -1),  # Trasera
-        (0, 0, 1),   # Frontal
-        (0, -1, 0),  # Inferior
-        (0, 1, 0),   # Superior
-        (-1, 0, 0),  # Izquierda
-        (1, 0, 0)    # Derecha
-    ]
-
-    glBegin(GL_QUADS)
-    for i in range(6):
-        glNormal3fv(normals[i])  # Normal de la cara
-        for j in faces[i]:
-            glVertex3fv(vertices[j])  # Dibuja los vértices
-    glEnd()
-
-
-
-def cono(base, height, num_segments, inverted=True):### si tenia el traslate pero se lo quitamos
-   
-
-    glEnable(GL_DEPTH_TEST)
-    glEnable(GL_LIGHTING)
-    glEnable(GL_LIGHT0)
-
-    # Dibujar la superficie lateral del cono
-    glBegin(GL_TRIANGLE_FAN)
-    glVertex3f(0, height, 0)  # Vértice superior del cono
-    for i in range(num_segments + 1):
-        angle = 2 * math.pi * i / num_segments
-        x = base * math.cos(angle)
-        y = 0
-        z = base * math.sin(angle)
-        glVertex3f(x, y, z)
-    glEnd()
-
-    # Dibujar la base del cono
-    glBegin(GL_TRIANGLE_FAN)
-    glVertex3f(0, 0, 0)  # Centro de la base
-    for i in range(num_segments + 1):
-        angle = 2 * math.pi * i / num_segments
-        x = base * math.cos(angle)
-        y = 0
-        z = base * math.sin(angle)
-        glVertex3f(x, y, z)
-    glEnd()
-
-    
-
-def cilindro(radio,angIncial,angFinal,segmentos):
-        glBegin(GL_QUAD_STRIP)
-        for i in range(segmentos):
-            angulo = angIncial + i * (angFinal - angIncial) / segmentos
-            x = radio * math.cos(angulo)
-            y = radio * math.sin(angulo)
-            glNormal3f(x, y, 0)
-            glVertex3f(x, y, 0)
-            glVertex3f(x, y, 1)
-        glEnd() 
-
-def mitadCirculo(radius=1, segments=20):###cambiar
-   
-    glBegin(GL_TRIANGLE_FAN)
-    glVertex2f(0, 0)  # Centro del semicírculo
-
-    for i in range(segments + 1):
-        angle = math.pi * (i / segments)  # De 0 a π (180 grados)
-        x = radius * math.cos(angle)
-        y = radius * math.sin(angle)
-        glVertex2f(x, y)
-
-    glEnd()
-
-
-
-def esfera(radius=1, slices=20, stacks=20):
-
-    for i in range(stacks):
-        lat0 = math.pi * (-0.5 + i / stacks)  # Ángulo de latitud
-        z0 = math.sin(lat0) * radius
-        zr0 = math.cos(lat0) * radius
-
-        lat1 = math.pi * (-0.5 + (i + 1) / stacks)
-        z1 = math.sin(lat1) * radius
-        zr1 = math.cos(lat1) * radius
-
-        glBegin(GL_TRIANGLE_STRIP)
-        for j in range(slices + 1):
-            lng = 2 * math.pi * (j / slices)  # Ángulo de longitud
-            x = math.cos(lng)
-            y = math.sin(lng)
-
-            glNormal3f(x * zr0, y * zr0, z0)
-            glVertex3f(x * zr0, y * zr0, z0)
-
-            glNormal3f(x * zr1, y * zr1, z1)
-            glVertex3f(x * zr1, y * zr1, z1)
-        glEnd()
-
-   
-def linea(x1, y1, z1, x2, y2, z2, thickness=3.0):
-
-
-    glLineWidth(thickness)  # Define el grosor de la línea
-    glBegin(GL_LINES)
-    glVertex3f(x1, y1, z1)  # Punto inicial
-    glVertex3f(x2, y2, z2)  # Punto final
-    glEnd()
-    glLineWidth(5.0)  # Restablece el grosor a 1.0 (opcional)
-    
-def load_texture(FileName):
-    #Abre la imagen del archivo que se dio.
-    im = Image.open(FileName)
-    #Obtiene el ancho y el alto de la imagen
-    ix, iy = im.size 
-    # Convertimos la imagen a bytes en formato RGB
-    image = im.tobytes("raw", "RGBX", 0, -1)
-        
-    #Identificador de la textura    
-    texture_id = glGenTextures(1)
-    #Vincula la textura con el identificador a una textura 2D
-    glBindTexture(GL_TEXTURE_2D, texture_id)
-    #Establece la alineación de los bytes de la textura
-    glPixelStorei(GL_UNPACK_ALIGNMENT, 1)
-
-    # Cambiamos el formato de la textura a GL_RGBA para que coincida con los bytes de la imagen
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, ix, iy, 0, GL_RGBA, GL_UNSIGNED_BYTE, image)
-   
-    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT)
-    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT)
-    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR)
-    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR)
-
-    return texture_id
-
-def cubo(size=1):
-   
-    vertices = [
-        [-size, -size, -size], [size, -size, -size], [size,  size, -size], [-size,  size, -size],  # Cara trasera
-        [-size, -size,  size], [size, -size,  size], [size,  size,  size], [-size,  size,  size]   # Cara delantera
-    ]
-
-    faces = [
-        (0, 1, 2, 3),  # Trasera
-        (4, 5, 6, 7),  # Frontal
-        (0, 1, 5, 4),  # Inferior
-        (2, 3, 7, 6),  # Superior
-        (0, 3, 7, 4),  # Izquierda
-        (1, 2, 6, 5)   # Derecha
-    ]
-
-    normals = [
-        (0, 0, -1),  # Trasera
-        (0, 0, 1),   # Frontal
-        (0, -1, 0),  # Inferior
-        (0, 1, 0),   # Superior
-        (-1, 0, 0),  # Izquierda
-        (1, 0, 0)    # Derecha
-    ]
-
-    glBegin(GL_QUADS)
-    for i in range(6):
-        glNormal3fv(normals[i])  # Define la normal de la cara
-        for j in faces[i]:
-            glVertex3fv(vertices[j])  # Dibuja los vértices
-    glEnd()
-"""
-import pygame
-from pygame.locals import *
-from OpenGL.GL import *
-from OpenGL.GLU import *
 import math
+def pinta_cono(x, y, z, radio_base, altura, color, rotacion):
+    """Dibuja un cono con posición, color y rotación opcional."""
+    glPushMatrix()
+    glTranslatef(x, y, z)
+    glRotatef(rotacion[0], 1, 0, 0)
+    glRotatef(rotacion[1], 0, 1, 0)
+    glRotatef(rotacion[2], 0, 0, 1)
 
-class Figuras3D:
+    glColor3f(*color)
+    glRotatef(-90, 1, 0, 0)  # Alinea el cono en eje Y
 
-    def __init__(self):
-        pass
+    quad = gluNewQuadric()
+    gluCylinder(quad, radio_base, 0.0, altura, 20, 20)
 
-    def establecer_color(self, color):
-        glColor3fv(color)
+    # Base del cono
+    glRotatef(180, 1, 0, 0)
+    gluDisk(quad, 0.0, radio_base, 20, 1)
 
-    def dibujar_cubo(self, x, y, z, tamaño, color):
-        self.establecer_color(color)
-        mitad = tamaño / 2
-        vertices = [
-            [x - mitad, y - mitad, z - mitad],
-            [x + mitad, y - mitad, z - mitad],
-            [x + mitad, y + mitad, z - mitad],
-            [x - mitad, y + mitad, z - mitad],
-            [x - mitad, y - mitad, z + mitad],
-            [x + mitad, y - mitad, z + mitad],
-            [x + mitad, y + mitad, z + mitad],
-            [x - mitad, y + mitad, z + mitad],
-        ]
-        caras = [
-            [0,1,2,3],
-            [4,5,6,7],
-            [0,1,5,4],
-            [2,3,7,6],
-            [1,2,6,5],
-            [0,3,7,4]
-        ]
-        glBegin(GL_QUADS)
-        for cara in caras:
-            for vertice in cara:
-                glVertex3fv(vertices[vertice])
-        glEnd()
+    glPopMatrix()
 
-    def dibujar_prisma(self, x, y, z, base, altura, color):
-        self.establecer_color(color)
-        mitad = base / 2
-        vertices = [
-            [x - mitad, y - mitad, z],
-            [x + mitad, y - mitad, z],
-            [x + mitad, y + mitad, z],
-            [x - mitad, y + mitad, z],
-            [x - mitad, y - mitad, z + altura],
-            [x + mitad, y - mitad, z + altura],
-            [x + mitad, y + mitad, z + altura],
-            [x - mitad, y + mitad, z + altura],
-        ]
-        caras = [
-            [0,1,2,3],
-            [4,5,6,7],
-            [0,1,5,4],
-            [2,3,7,6],
-            [1,2,6,5],
-            [0,3,7,4]
-        ]
-        glBegin(GL_QUADS)
-        for cara in caras:
-            for vertice in cara:
-                glVertex3fv(vertices[vertice])
-        glEnd()
+def pinta_cubo(x, y, z, size, color):
+    """Dibuja un cubo manualmente, centrado en (x, y, z), con tamaño y color."""
+    hs = size / 2.0  # mitad del tamaño para centrarlo
+    glPushMatrix()
+    glTranslatef(x, y, z)
+    glColor3f(*color)
 
-    def dibujar_cono(self, x, y, z, radio, altura, color, segmentos=32):
-        self.establecer_color(color)
-        glBegin(GL_TRIANGLE_FAN)
-        glVertex3f(x, y, z + altura)
-        for i in range(segmentos + 1):
-            angulo = 2 * math.pi * i / segmentos
-            vx = x + radio * math.cos(angulo)
-            vy = y + radio * math.sin(angulo)
-            glVertex3f(vx, vy, z)
-        glEnd()
+    # Caras del cubo
+    glBegin(GL_QUADS)
+    # Cara frontal
+    glVertex3f(-hs, -hs,  hs)
+    glVertex3f( hs, -hs,  hs)
+    glVertex3f( hs,  hs,  hs)
+    glVertex3f(-hs,  hs,  hs)
 
-        glBegin(GL_TRIANGLE_FAN)
-        glVertex3f(x, y, z)
-        for i in range(segmentos + 1):
-            angulo = 2 * math.pi * i / segmentos
-            vx = x + radio * math.cos(angulo)
-            vy = y + radio * math.sin(angulo)
-            glVertex3f(vx, vy, z)
-        glEnd()
+    # Cara trasera
+    glVertex3f( hs, -hs, -hs)
+    glVertex3f(-hs, -hs, -hs)
+    glVertex3f(-hs,  hs, -hs)
+    glVertex3f( hs,  hs, -hs)
 
-    def dibujar_piramide(self, x, y, z, base, altura, color):
-        self.establecer_color(color)
-        mitad = base / 2
-        vertices_base = [
-            [x - mitad, y - mitad, z],
-            [x + mitad, y - mitad, z],
-            [x + mitad, y + mitad, z],
-            [x - mitad, y + mitad, z],
-        ]
-        vertice_apice = [x, y, z + altura]
+    # Cara izquierda
+    glVertex3f(-hs, -hs, -hs)
+    glVertex3f(-hs, -hs,  hs)
+    glVertex3f(-hs,  hs,  hs)
+    glVertex3f(-hs,  hs, -hs)
 
-        glBegin(GL_TRIANGLES)
-        for i in range(4):
-            glVertex3fv(vertices_base[i])
-            glVertex3fv(vertices_base[(i + 1) % 4])
-            glVertex3fv(vertice_apice)
-        glEnd()
+    # Cara derecha
+    glVertex3f( hs, -hs,  hs)
+    glVertex3f( hs, -hs, -hs)
+    glVertex3f( hs,  hs, -hs)
+    glVertex3f( hs,  hs,  hs)
 
-        glBegin(GL_QUADS)
-        for vertice in vertices_base:
-            glVertex3fv(vertice)
-        glEnd()
+    # Cara superior
+    glVertex3f(-hs,  hs,  hs)
+    glVertex3f( hs,  hs,  hs)
+    glVertex3f( hs,  hs, -hs)
+    glVertex3f(-hs,  hs, -hs)
 
-    def dibujar_esfera(self, x, y, z, radio, color):
-        self.establecer_color(color)
-        glPushMatrix()
-        glTranslatef(x, y, z)
-        quadric = gluNewQuadric()
-        gluSphere(quadric, radio, 32, 32)
-        gluDeleteQuadric(quadric)
-        glPopMatrix()
+    # Cara inferior
+    glVertex3f(-hs, -hs, -hs)
+    glVertex3f( hs, -hs, -hs)
+    glVertex3f( hs, -hs,  hs)
+    glVertex3f(-hs, -hs,  hs)
+    glEnd()
 
-def iniciar_pantalla(ancho=800, alto=600):
-    pygame.init()
-    pygame.display.set_mode((ancho, alto), DOUBLEBUF | OPENGL)
-    glEnable(GL_DEPTH_TEST)
-    gluPerspective(45, (ancho / alto), 0.1, 100.0)
-    glTranslatef(0.0, 0.0, -20)
- #Ejemplo
+    glPopMatrix()
+
+def pinta_piramide(x, y, z, base, altura, color):
+    """Dibuja una pirámide de base cuadrada centrada en (x, y, z)."""
+    hs = base / 2.0  # mitad del tamaño base
+    glPushMatrix()
+    glTranslatef(x, y, z)
+    glColor3f(*color)
+
+    # Caras triangulares
+    glBegin(GL_TRIANGLES)
+    # Frente
+    glVertex3f(-hs, 0, hs)
+    glVertex3f(hs, 0, hs)
+    glVertex3f(0, altura, 0)
+
+    # Derecha
+    glVertex3f(hs, 0, hs)
+    glVertex3f(hs, 0, -hs)
+    glVertex3f(0, altura, 0)
+
+    # Atrás
+    glVertex3f(hs, 0, -hs)
+    glVertex3f(-hs, 0, -hs)
+    glVertex3f(0, altura, 0)
+
+    # Izquierda
+    glVertex3f(-hs, 0, -hs)
+    glVertex3f(-hs, 0, hs)
+    glVertex3f(0, altura, 0)
+    glEnd()
+
+    # Base cuadrada
+    glBegin(GL_QUADS)
+    glVertex3f(-hs, 0, hs)
+    glVertex3f(hs, 0, hs)
+    glVertex3f(hs, 0, -hs)
+    glVertex3f(-hs, 0, -hs)
+    glEnd()
+
+    glPopMatrix()
+
+def pinta_prisma(x, y, z, escala, rotacion, color):
+    """
+    Dibuja un prisma rectangular (cuboid) con posición, escala y rotación personalizada.
+    escala: (sx, sy, sz) → tamaño en cada eje.
+    rotacion: (rx, ry, rz) → grados a rotar en cada eje.
+    """
+    glPushMatrix()
+    glTranslatef(x, y, z)
+    glRotatef(rotacion[0], 1, 0, 0)
+    glRotatef(rotacion[1], 0, 1, 0)
+    glRotatef(rotacion[2], 0, 0, 1)
+    glScalef(*escala)
+    glColor3f(*color)
+
+    # Dibuja cubo base (prisma escalado)
+    glBegin(GL_QUADS)
+    # Cara frontal
+    glVertex3f(-0.5, -0.5, 0.5)
+    glVertex3f( 0.5, -0.5, 0.5)
+    glVertex3f( 0.5,  0.5, 0.5)
+    glVertex3f(-0.5,  0.5, 0.5)
+
+    # Cara trasera
+    glVertex3f( 0.5, -0.5, -0.5)
+    glVertex3f(-0.5, -0.5, -0.5)
+    glVertex3f(-0.5,  0.5, -0.5)
+    glVertex3f( 0.5,  0.5, -0.5)
+
+    # Izquierda
+    glVertex3f(-0.5, -0.5, -0.5)
+    glVertex3f(-0.5, -0.5,  0.5)
+    glVertex3f(-0.5,  0.5,  0.5)
+    glVertex3f(-0.5,  0.5, -0.5)
+
+    # Derecha
+    glVertex3f( 0.5, -0.5,  0.5)
+    glVertex3f( 0.5, -0.5, -0.5)
+    glVertex3f( 0.5,  0.5, -0.5)
+    glVertex3f( 0.5,  0.5,  0.5)
+
+    # Superior
+    glVertex3f(-0.5, 0.5,  0.5)
+    glVertex3f( 0.5, 0.5,  0.5)
+    glVertex3f( 0.5, 0.5, -0.5)
+    glVertex3f(-0.5, 0.5, -0.5)
+
+    # Inferior
+    glVertex3f(-0.5, -0.5, -0.5)
+    glVertex3f( 0.5, -0.5, -0.5)
+    glVertex3f( 0.5, -0.5,  0.5)
+    glVertex3f(-0.5, -0.5,  0.5)
+    glEnd()
+    glPopMatrix()
+
+
+def pinta_esfera(x, y, z, radio, color):
+    glPushMatrix()
+    glTranslatef(x, y, z)
+    glColor3f(*color)
+    quad = gluNewQuadric()
+    gluSphere(quad, radio, 20, 20)
+    glPopMatrix()
+
+def pinta_bocaFeliz(x, y, z, radio, angulo_inicio, angulo_fin, color):
+    """Dibuja un arco como boca en el plano XY, de angulo_inicio a angulo_fin (grados)."""
+    glPushMatrix()
+    glTranslatef(x, y, z)
+    glColor3f(*color)
+    glBegin(GL_LINE_STRIP)
+    for ang in range(angulo_inicio, angulo_fin+1, 5):
+        rad = math.radians(ang)
+        glVertex3f(radio * math.cos(rad), radio * math.sin(rad), 0)
+    glEnd()
+    glPopMatrix()

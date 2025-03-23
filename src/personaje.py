@@ -1,116 +1,18 @@
-import pygame
-import math
+
 from OpenGL.GL import *
 from OpenGL.GLU import *
 from pygame.locals import *
-import src.pinta as pinta
-import Acciones.colores as color
-import Acciones.objetos as obj
+import Acciones.objetos as pinta
 
-
-
-def enojado():
-    color.colorNaranja1()
-    pinta.parteSuperior(1, 1, 20)
-    pinta.parteInferior(1, 1, 20)
-    color.colorRojo2()
-    pinta.cabeza(0.7)
-    color.colorAzulado()
-    pinta.sombrero(.8, .8, 4)
-    pinta.pieIzq(.2,0.9,0.2)
-    pinta.pieDer(.2,0.9,0.2)
-    pinta.manoIzq(0.9,0.2,0.2)
-    pinta.manoDer(0.9,0.2,0.2)
-    pinta.bocaTriste()
-    color.colorVerde()
-    glTranslatef(0, 0.7, -0.02)
-    obj.ojo(.2,20,50)
-    glTranslatef(0, 0.2, 5) 
-    pinta.cejaEnojado()
-
-def sorprendido():
-    color.colorNaranja1()
-    pinta.parteSuperior(1, 1, 20)
-    pinta.parteInferior(1, 1, 20)
-    color.colorRojo2()
-    pinta.cabeza(0.7)
-    color.colorAzulado()
-    pinta.sombrero(.8, .8, 4)
-    pinta.pieIzq(.2,0.9,0.2)
-    pinta.pieDer(.2,0.9,0.2)
-    pinta.manoIzq(0.9,0.2,0.2)
-    pinta.manoDer(0.9,0.2,0.2)
-    color.colorNegro()
-    pinta.bocaSorp(0.2,100)
-    color.colorVerde()
-    glTranslatef(0, .5, -0.02)
-    obj.ojo(.2,20,50)
-    glTranslatef(0, -0.2,-0.02 )
-    pinta.cejaSorp()
-
-
-def feliz():
-    color.colorNaranja1()
-    pinta.parteSuperior(1, 1, 20)
-    pinta.parteInferior(1, 1, 20)
-    color.colorRojo2()
-    pinta.cabeza(0.7)
-    color.colorAzulado()
-    pinta.sombrero(.8, .8, 4)
-    pinta.pieIzq(.2,0.9,0.2)
-    pinta.pieDer(.2,0.9,0.2)
-    pinta.manoIzq(0.9,0.2,0.2)
-    pinta.manoDer(0.9,0.2,0.2)
-
-    glPushMatrix()
-    glTranslatef(0.9, 1, 0.72)
-    color.colorAzulado()
-    obj.ojo(.2,20,50)
-    pinta.cejaSorp()
- 
-
-    glTranslatef(0, -0.3, 0)
-    pinta.bocaFeliz()
-
-    glPopMatrix()
-
-
-
-def asustado():
-    color.colorNaranja1()
-    pinta.parteSuperior(1, 1, 20)
-    pinta.parteInferior(1, 1, 20)
-    color.colorRojo2()
-    pinta.cabeza(0.7)
-    color.colorAzulado()
-    pinta.sombrero(.8, .8, 4)
-    pinta.pieIzq(.2,0.9,0.2)
-    pinta.pieDer(.2,0.9,0.2)
-    pinta.manoIzq(0.9,0.2,0.2)
-    pinta.manoDer(0.9,0.2,0.2)
-    pinta.bocaTriste()
-    color.colorNegro()
-    obj.ojo(.2,20,50)
-    
-    glTranslatef(0, -0.1, 0)
-    pinta.cejaSorp()
-
-def triste():
-    color.colorNaranja1()
-    pinta.parteSuperior(1, 1, 20)
-    pinta.parteInferior(1, 1, 20)
-    color.colorRojo2()
-    pinta.cabeza(0.7)
-    color.colorAzulado()
-    pinta.sombrero(.8, .8, 4)
-    pinta.pieIzq(.2,0.9,0.2)
-    pinta.pieDer(.2,0.9,0.2)
-    pinta.manoIzq(0.9,0.2,0.2)
-    pinta.manoDer(0.9,0.2,0.2)
-
-    color.colorNegro()
-    obj.ojo(.2,20,50)
-    
-    glTranslatef(0, -0.8, 0)
-    pinta.cejaEnojado()
-    
+def pinta_Normal():
+    pinta.pinta_cono(x=0, y=-1.5, z=0, radio_base=1, altura=1.5, color=(1.0, 0.5, 0.0), rotacion=(0, 0, 0))
+    pinta.pinta_cono(x=0, y=1.5, z=0, radio_base=1, altura=1.5, color=(1.0, 0.5, 0.0), rotacion=(180, 0, 0))
+    pinta.pinta_cubo(x=0, y=2.25, z=0, size=1.5, color=(1.0, 0.0, 1.0))
+    pinta.pinta_piramide(x=0, y=3.0, z=0, base=1.5, altura=1.5, color=(1.0, 0.5, 0.0))
+    pinta.pinta_prisma(x=-1.0, y=1.0, z=0, escala=(0.3, 1.0, 0.3), rotacion=(0, 0, 20), color=(1.0, 0.0, 1.0))  # Izquierdo
+    pinta.pinta_prisma(x=1.0, y=1.0, z=0, escala=(0.3, 1.0, 0.3), rotacion=(0, 0, -20), color=(1.0, 0.0, 1.0))  # Derecho
+    pinta.pinta_prisma(x=-0.7, y=-1.5, z=0.5, escala=(0.3, 0.9, 0.3), rotacion=(-45, 0, 0), color=(1.0, 0.0, 1.0))  # Izq
+    pinta.pinta_prisma(x=0.7, y=-1.5, z=0.5, escala=(0.3, 0.9, 0.3), rotacion=(-45, 0, 0), color=(1.0, 0.0, 1.0))  # Der
+    pinta.pinta_esfera(x=-0.4, y=2.4, z=0.76, radio=0.1, color=(0, 0, 0))  # Ojo izquierdo
+    pinta.pinta_esfera(x=0.4, y=2.4, z=0.76, radio=0.1, color=(0, 0, 0))   # Ojo derecho
+    pinta.pinta_bocaFeliz(x=0, y=2.0, z=0.76, radio=0.4, angulo_inicio=180, angulo_fin=360, color=(0, 0, 0))

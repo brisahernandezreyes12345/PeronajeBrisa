@@ -102,6 +102,7 @@ from OpenGL.GLUT import *
 from pygame.locals import *
 from Acciones import escenarios as es
 from Acciones import sonidos as sd
+from src import personaje as per
 
 camara_z = -9
 rotacion_y = 0.0
@@ -160,10 +161,13 @@ while running:
     glColor3f(1.0, 1.0, 1.0)
     es.pinta_escenario(fondoAc) 
 
+    per.pinta_Normal()
     glPopMatrix()
     pygame.display.flip()
     pygame.time.wait(10)
 
 pygame.quit()
+
+
     
 
