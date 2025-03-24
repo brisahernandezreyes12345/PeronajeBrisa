@@ -5,8 +5,6 @@ from OpenGL.GLUT import *
 from pygame.locals import *
 import math
 
-import Acciones.luces as lc
-import Acciones.colores as color
 import Acciones.objetos as obj
 from PIL import Image
 
@@ -16,10 +14,10 @@ def bocaTriste():
     glPushMatrix()
     
     glTranslatef(0.9, 0.5, -0.72) 
-    color.colorNegro()
+    #color.colorNegro()
 
     glPopMatrix()
-    obj.mitadCirculo(0.3, 30) 
+   # obj.mitadCirculo(0.3, 30) 
     
 
 def bocaSorp(radius=0.5, segments=100):
@@ -47,7 +45,7 @@ def bocaFeliz():####################### no esta utilizando traslatef OJOOOOOOOOU
     
     glPopMatrix()
 
-    obj.mitadCirculo(0.3, 30) 
+   # obj.mitadCirculo(0.3, 30) 
     
  
 
@@ -71,11 +69,11 @@ def cejaSorp(radius=0.5, start_angle=50, end_angle=130, segments=50, thickness=7
     glPopMatrix()
 
 
-def cejaEnojado():
+#def cejaEnojado():
 
     #FALTA EL TRASLATEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE
 
-    obj.linea(-0.3, 0, -5, 0.3, 0, -5,  thickness=8.0)  # Línea gruesa
+    #obj.linea(-0.3, 0, -5, 0.3, 0, -5,  thickness=8.0)  # Línea gruesa
     
 
 ################## CUERPO ###################
@@ -83,11 +81,11 @@ def cejaEnojado():
 def parteSuperior():
 
     
-    color.colorNaranja()
+    #color.colorNaranja()
     glPushMatrix()
 
     glTranslatef(1,4,3)
-    obj.cono(3,4,4)
+    #obj.cono(3,4,4)
     
     glPopMatrix()
 
@@ -98,7 +96,7 @@ def parteInferior():
     glEnable(GL_COLOR_MATERIAL)  # Habilita el uso de colores en materiales
     glColorMaterial(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE)
 
-    color.colorNaranja()  # Aplica el color naranja correctamente
+    #color.colorNaranja()  # Aplica el color naranja correctamente
 
     glTranslatef(-1, -12, -3)  # Mueve la figura antes de rotar
     glRotatef(180, 0, 1, 0)  # Rota correctamente en el eje Y
@@ -116,7 +114,7 @@ def piernaIzq():
 
     glTranslatef(0.2,3,1.4)
     
-    obj.rectangulo(0.7,4,0.5)
+    #obj.rectangulo(0.7,4,0.5)
     
     glPopMatrix()
 
